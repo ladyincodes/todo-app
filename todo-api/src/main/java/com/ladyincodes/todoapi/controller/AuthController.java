@@ -1,5 +1,7 @@
 package com.ladyincodes.todoapi.controller;
 
+import com.ladyincodes.todoapi.exception.DuplicateEmailException;
+import com.ladyincodes.todoapi.exception.DuplicateUsernameException;
 import com.ladyincodes.todoapi.model.User;
 import com.ladyincodes.todoapi.payload.request.RegisterRequest;
 import com.ladyincodes.todoapi.repository.UserRepository;
@@ -23,11 +25,11 @@ public class AuthController {
     @PostMapping ("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity.badRequest().body("Email is already in use!");
+            throw new DuplicateEmailException(request.getEmail());
         }
 
         if (userRepository.existsByUsername(request.getUsername())) {
-            return ResponseEntity.badRequest().body("Username is already taken!");
+            throw new DuplicateUsernameException(request.getUsername());
         }
 
         User user = new User();
