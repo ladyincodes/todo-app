@@ -5,7 +5,9 @@ import com.ladyincodes.todoapi.exception.DuplicateUsernameException;
 import com.ladyincodes.todoapi.model.User;
 import com.ladyincodes.todoapi.payload.request.LoginRequest;
 import com.ladyincodes.todoapi.payload.request.RegisterRequest;
+import com.ladyincodes.todoapi.payload.response.AuthResponse;
 import com.ladyincodes.todoapi.repository.UserRepository;
+import com.ladyincodes.todoapi.security.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @PostMapping ("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
@@ -53,8 +56,10 @@ public class AuthController {
             throw new RuntimeException("Invalid email or password");
         }
 
-        // return success message
-        return ResponseEntity.ok("Login successful!");
+        // generates token
+        String token = jwtService.generateToken(user.getEmail());
+
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
 }
