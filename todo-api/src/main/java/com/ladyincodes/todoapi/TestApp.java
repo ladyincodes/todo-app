@@ -10,4 +10,9 @@ public class TestApp {
     public String home() {
         return "Todo API is running ✅";
     }
+
+    @GetMapping("/api/protected")
+    public String securedEndpoint() {
+        return "You are authenticated! 🎉";
+    }
 }
