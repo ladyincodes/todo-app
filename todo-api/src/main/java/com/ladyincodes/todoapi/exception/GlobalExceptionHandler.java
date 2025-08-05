@@ -74,5 +74,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    public ResponseEntity<CustomErrorResponse> handleInvalidCredentials (InvalidCredentialsException ex, HttpServletRequest request) {
+        CustomErrorResponse error = CustomErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Invalid Credentials")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
 
 }

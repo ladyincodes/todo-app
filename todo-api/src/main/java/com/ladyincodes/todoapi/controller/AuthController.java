@@ -2,6 +2,7 @@ package com.ladyincodes.todoapi.controller;
 
 import com.ladyincodes.todoapi.exception.DuplicateEmailException;
 import com.ladyincodes.todoapi.exception.DuplicateUsernameException;
+import com.ladyincodes.todoapi.exception.InvalidCredentialsException;
 import com.ladyincodes.todoapi.model.User;
 import com.ladyincodes.todoapi.payload.request.LoginRequest;
 import com.ladyincodes.todoapi.payload.request.RegisterRequest;
@@ -49,11 +50,11 @@ public class AuthController {
     @PostMapping ("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         // find user by email
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new InvalidCredentialsException());
 
         // check password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException();
         }
 
         // generates token
