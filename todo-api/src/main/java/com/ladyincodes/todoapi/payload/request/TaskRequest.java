@@ -3,7 +3,7 @@ package com.ladyincodes.todoapi.payload.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class TaskRequest {
@@ -12,5 +12,5 @@ public class TaskRequest {
     private String title;
     private String description;
     private boolean completed;
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
 }

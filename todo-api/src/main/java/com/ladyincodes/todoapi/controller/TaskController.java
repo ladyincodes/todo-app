@@ -1,7 +1,6 @@
 package com.ladyincodes.todoapi.controller;
 
 import com.ladyincodes.todoapi.exception.TaskNotFoundException;
-import com.ladyincodes.todoapi.exception.UserNotFoundException;
 import com.ladyincodes.todoapi.model.Task;
 import com.ladyincodes.todoapi.model.User;
 import com.ladyincodes.todoapi.payload.request.TaskRequest;
@@ -9,12 +8,13 @@ import com.ladyincodes.todoapi.payload.response.TaskResponse;
 import com.ladyincodes.todoapi.repository.TaskRepository;
 import com.ladyincodes.todoapi.repository.UserRepository;
 import com.ladyincodes.todoapi.security.JwtService;
+import com.ladyincodes.todoapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,15 +24,15 @@ public class TaskController {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final JwtService jwtService;
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> getAllTasks() {
-        // get current user's email from SecurityContext
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<List<TaskResponse>> getAllTasks(@RequestParam(required = false) Boolean completed, @RequestParam(required = false, defaultValue = "false") Boolean dueToday) {
 
         // fetch the user entity
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+        User user = userService.getCurrentUser();
+        LocalDate today = LocalDate.now();
 
         // get all tasks for this user
         List<Task> tasks = taskRepository.findByUser(user);
@@ -54,11 +54,8 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest request) {
 
-        // get current user's email from the JWT
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         // find the user entity
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+        User user = userService.getCurrentUser();
 
         // create and saves the task
         Task task = Task.builder()
@@ -66,7 +63,7 @@ public class TaskController {
                 .description(request.getDescription())
                 .completed(request.isCompleted())
                 .dueDate(request.getDueDate())
-                .createdAt(java.time.LocalDateTime.now())
+                .createdAt(java.time.LocalDate.now())
                 .user(user)
                 .build();
 
@@ -88,11 +85,9 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
-        // get the current user's email from SecurityContext
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // fetch the user
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+        User user = userService.getCurrentUser();
 
         // fetch the task by id and user
         Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
@@ -115,9 +110,7 @@ public class TaskController {
     public ResponseEntity<TaskResponse> updateTask (@PathVariable Long id,
                                                     @Valid @RequestBody TaskRequest request) {
 
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+        User user = userService.getCurrentUser();
 
         Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
 
@@ -146,9 +139,7 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+        User user = userService.getCurrentUser();
 
         Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
 

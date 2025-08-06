@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table (name = "tasks")
@@ -26,9 +25,9 @@ public class Task {
 
     private boolean completed = false;
 
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDate createdAt = LocalDate.now();
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

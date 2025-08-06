@@ -20,4 +20,11 @@ public class UserService {
 
         return new UserProfileResponse(user.getId(), user.getUsername(), user.getEmail());
     }
+
+    public User getCurrentUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
+    }
+
 }
