@@ -34,8 +34,15 @@ public class TaskController {
         User user = userService.getCurrentUser();
         LocalDate today = LocalDate.now();
 
-        // get all tasks for this user
-        List<Task> tasks = taskRepository.findByUser(user);
+        // getting tasks based on params
+        List<Task> tasks;
+        if (completed != null) {
+            tasks = taskRepository.findByUserIdAndCompleted(user.getId(), completed);
+        } else if (dueToday) {
+            tasks = taskRepository.findByUserIdAndDueDate(user.getId(), today);
+        } else {
+            tasks = taskRepository.findByUserId(user.getId());
+        }
 
         // map each task to the TaskResponse dto
         List<TaskResponse> responses = tasks.stream().map(task -> TaskResponse.builder()
