@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table (name = "tasks")
 @Data // generates getters, setters, toString, etc.
@@ -22,6 +25,10 @@ public class Task {
     private String description;
 
     private boolean completed = false;
+
+    private LocalDateTime dueDate;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
