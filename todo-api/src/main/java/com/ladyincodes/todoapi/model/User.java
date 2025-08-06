@@ -1,6 +1,8 @@
 package com.ladyincodes.todoapi.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,17 +21,19 @@ public class User {
     private Long id;
 
     @Column (nullable = false, unique = true)
-    @NonNull
+    @NotBlank (message = "Username is required")
     private String username;
 
     @Column (nullable = false)
-    @NonNull
+    @NotBlank(message = "Password is required")
     private String password;
 
+    @Email (message = "Email should be valid")
     @Column (nullable = false, unique = true)
+    @NotBlank (message = "Email is required")
     private String email;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
 
 }
