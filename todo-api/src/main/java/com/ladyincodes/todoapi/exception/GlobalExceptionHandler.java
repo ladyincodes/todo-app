@@ -74,6 +74,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<CustomErrorResponse> handleInvalidCredentials (InvalidCredentialsException ex, HttpServletRequest request) {
         CustomErrorResponse error = CustomErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
@@ -84,6 +85,32 @@ public class GlobalExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<CustomErrorResponse> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
+        CustomErrorResponse error = CustomErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("User Not Found")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<CustomErrorResponse> handleTaskNotFound(TaskNotFoundException ex, HttpServletRequest request) {
+        CustomErrorResponse error = CustomErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Task Not Found")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
 

@@ -1,5 +1,7 @@
 package com.ladyincodes.todoapi.controller;
 
+import com.ladyincodes.todoapi.exception.TaskNotFoundException;
+import com.ladyincodes.todoapi.exception.UserNotFoundException;
 import com.ladyincodes.todoapi.model.Task;
 import com.ladyincodes.todoapi.model.User;
 import com.ladyincodes.todoapi.payload.request.TaskRequest;
@@ -30,7 +32,7 @@ public class TaskController {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // fetch the user entity
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
 
         // get all tasks for this user
         List<Task> tasks = taskRepository.findByUser(user);
@@ -56,7 +58,7 @@ public class TaskController {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // find the user entity
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
 
         // create and saves the task
         Task task = Task.builder()
@@ -90,10 +92,10 @@ public class TaskController {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // fetch the user
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException ("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
 
         // fetch the task by id and user
-        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
 
         // convert to TaskResponse dto
         TaskResponse response = TaskResponse.builder()
@@ -115,9 +117,9 @@ public class TaskController {
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
 
-        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
 
         // update the task
         task.setTitle(request.getTitle());
@@ -146,9 +148,9 @@ public class TaskController {
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("No user found with email: " + email));
 
-        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new RuntimeException("User not found"));
+        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
 
         // delete the task
         taskRepository.delete(task);
