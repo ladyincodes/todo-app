@@ -8,6 +8,7 @@ import com.ladyincodes.todoapi.payload.response.TaskResponse;
 import com.ladyincodes.todoapi.repository.TaskRepository;
 import com.ladyincodes.todoapi.repository.UserRepository;
 import com.ladyincodes.todoapi.security.JwtService;
+import com.ladyincodes.todoapi.service.TaskService;
 import com.ladyincodes.todoapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,37 +26,14 @@ public class TaskController {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final TaskService taskService;
     private final JwtService jwtService;
 
     @GetMapping
     public ResponseEntity<List<TaskResponse>> getAllTasks(@RequestParam(required = false) Boolean completed, @RequestParam(required = false, defaultValue = "false") Boolean dueToday) {
 
-        // fetch the user entity
-        User user = userService.getCurrentUser();
-        LocalDate today = LocalDate.now();
-
         // getting tasks based on params
-        List<Task> tasks;
-        if (completed != null) {
-            tasks = taskRepository.findByUserIdAndCompleted(user.getId(), completed);
-        } else if (dueToday) {
-            tasks = taskRepository.findByUserIdAndDueDate(user.getId(), today);
-        } else {
-            tasks = taskRepository.findByUserId(user.getId());
-        }
-
-        // map each task to the TaskResponse dto
-        List<TaskResponse> responses = tasks.stream().map(task -> TaskResponse.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .completed(task.isCompleted())
-                .createdAt(task.getCreatedAt())
-                .dueDate(task.getDueDate())
-                .build()
-        ).toList();
-
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(taskService.getFilteredTasks(completed, dueToday));
     }
 
     @PostMapping
