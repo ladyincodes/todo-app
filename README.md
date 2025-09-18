@@ -75,6 +75,7 @@ cd todo-app
 
 ## ✨ Status
 
-🚧 In development — backend and frontend in progress.
+✅ Backend: Completed
+🚧 Frontend: In development
 
 ---
