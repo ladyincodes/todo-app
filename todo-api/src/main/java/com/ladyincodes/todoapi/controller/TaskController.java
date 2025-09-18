@@ -79,12 +79,7 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        User user = userService.getCurrentUser();
-
-        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
-
-        // delete the task
-        taskRepository.delete(task);
+        taskService.deleteTaskById(id);
 
         return ResponseEntity.noContent().build(); // 204 No Content
     }

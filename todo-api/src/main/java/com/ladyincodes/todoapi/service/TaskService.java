@@ -19,6 +19,15 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
 
+    public void deleteTaskById(Long id) {
+        User user = userService.getCurrentUser();
+
+        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
+
+        // delete the task
+        taskRepository.delete(task);
+    }
+
     public TaskResponse updateTask(Long id, TaskRequest request) {
         User user = userService.getCurrentUser();
 
