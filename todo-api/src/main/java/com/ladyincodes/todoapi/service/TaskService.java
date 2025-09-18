@@ -1,5 +1,6 @@
 package com.ladyincodes.todoapi.service;
 
+import com.ladyincodes.todoapi.exception.TaskNotFoundException;
 import com.ladyincodes.todoapi.model.Task;
 import com.ladyincodes.todoapi.model.User;
 import com.ladyincodes.todoapi.payload.request.TaskRequest;
@@ -17,6 +18,31 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserService userService;
+
+    public TaskResponse updateTask(Long id, TaskRequest request) {
+        User user = userService.getCurrentUser();
+
+        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
+
+        // update the task
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setCompleted(request.isCompleted());
+        task.setDueDate(request.getDueDate());
+
+        // save the task
+        Task updatedTask = taskRepository.save(task);
+
+        // return the updated task as a response
+        return TaskResponse.builder()
+                .id(updatedTask.getId())
+                .title(updatedTask.getTitle())
+                .description(updatedTask.getDescription())
+                .completed(updatedTask.isCompleted())
+                .createdAt(updatedTask.getCreatedAt())
+                .dueDate(updatedTask.getDueDate())
+                .build();
+    }
 
     public TaskResponse createTask (TaskRequest request) {
         // find the user entity

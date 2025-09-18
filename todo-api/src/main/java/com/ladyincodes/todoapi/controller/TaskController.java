@@ -72,30 +72,8 @@ public class TaskController {
     public ResponseEntity<TaskResponse> updateTask (@PathVariable Long id,
                                                     @Valid @RequestBody TaskRequest request) {
 
-        User user = userService.getCurrentUser();
-
-        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
-
-        // update the task
-        task.setTitle(request.getTitle());
-        task.setDescription(request.getDescription());
-        task.setCompleted(request.isCompleted());
-        task.setDueDate(request.getDueDate());
-
-        // save the task
-        Task updatedTask = taskRepository.save(task);
-
-        // return the updated task as a response
-        TaskResponse response = TaskResponse.builder()
-                .id(updatedTask.getId())
-                .title(updatedTask.getTitle())
-                .description(updatedTask.getDescription())
-                .completed(updatedTask.isCompleted())
-                .createdAt(updatedTask.getCreatedAt())
-                .dueDate(updatedTask.getDueDate())
-                .build();
-
-        return ResponseEntity.ok(response);
+        TaskResponse updatedTask = taskService.updateTask(id, request);
+        return ResponseEntity.ok(updatedTask);
 
     }
 
