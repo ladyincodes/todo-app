@@ -48,23 +48,8 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
 
-        // fetch the user
-        User user = userService.getCurrentUser();
-
-        // fetch the task by id and user
-        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
-
-        // convert to TaskResponse dto
-        TaskResponse response = TaskResponse.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .completed(task.isCompleted())
-                .createdAt(task.getCreatedAt())
-                .dueDate(task.getDueDate())
-                .build();
-
-        return ResponseEntity.ok(response);
+        TaskResponse taskById = taskService.getTaskById(id);
+        return ResponseEntity.ok(taskById);
 
     }
 

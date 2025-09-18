@@ -19,6 +19,24 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
 
+    public TaskResponse getTaskById(Long id) {
+        // fetch the user
+        User user = userService.getCurrentUser();
+
+        // fetch the task by id and user
+        Task task = taskRepository.findByIdAndUser(id, user).orElseThrow(() -> new TaskNotFoundException("No task found with id: " + id));
+
+        // convert to TaskResponse dto and return
+        return TaskResponse.builder()
+                .id(task.getId())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .completed(task.isCompleted())
+                .createdAt(task.getCreatedAt())
+                .dueDate(task.getDueDate())
+                .build();
+    }
+
     public void deleteTaskById(Long id) {
         User user = userService.getCurrentUser();
 
