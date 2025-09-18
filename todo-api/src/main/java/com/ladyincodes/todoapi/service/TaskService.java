@@ -2,6 +2,7 @@ package com.ladyincodes.todoapi.service;
 
 import com.ladyincodes.todoapi.model.Task;
 import com.ladyincodes.todoapi.model.User;
+import com.ladyincodes.todoapi.payload.request.TaskRequest;
 import com.ladyincodes.todoapi.payload.response.TaskResponse;
 import com.ladyincodes.todoapi.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,33 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserService userService;
+
+    public TaskResponse createTask (TaskRequest request) {
+        // find the user entity
+        User user = userService.getCurrentUser();
+
+        // create and saves the task
+        Task task = Task.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .completed(request.isCompleted())
+                .dueDate(request.getDueDate())
+                .createdAt(java.time.LocalDate.now())
+                .user(user)
+                .build();
+
+        Task savedTask = taskRepository.save(task);
+
+        // return response
+        return TaskResponse.builder()
+                .id(savedTask.getId())
+                .title(savedTask.getTitle())
+                .description(savedTask.getDescription())
+                .completed(savedTask.isCompleted())
+                .createdAt(savedTask.getCreatedAt())
+                .dueDate(savedTask.getDueDate())
+                .build();
+    }
 
     public List<TaskResponse> getFilteredTasks(Boolean completed, Boolean dueToday) {
         User currentUser = userService.getCurrentUser();

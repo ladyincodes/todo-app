@@ -12,6 +12,7 @@ import com.ladyincodes.todoapi.service.TaskService;
 import com.ladyincodes.todoapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,33 +39,9 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest request) {
-
-        // find the user entity
-        User user = userService.getCurrentUser();
-
-        // create and saves the task
-        Task task = Task.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .completed(request.isCompleted())
-                .dueDate(request.getDueDate())
-                .createdAt(java.time.LocalDate.now())
-                .user(user)
-                .build();
-
-        Task savedTask = taskRepository.save(task);
-
-        // return response
-        TaskResponse response = TaskResponse.builder()
-                .id(savedTask.getId())
-                .title(savedTask.getTitle())
-                .description(savedTask.getDescription())
-                .completed(savedTask.isCompleted())
-                .createdAt(savedTask.getCreatedAt())
-                .dueDate(savedTask.getDueDate())
-                .build();
-
-        return ResponseEntity.ok(response);
+        // Save the task
+        TaskResponse response = taskService.createTask(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
 

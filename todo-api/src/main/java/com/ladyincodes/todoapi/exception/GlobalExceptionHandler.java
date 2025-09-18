@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -18,8 +19,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomErrorResponse> handleValidationError(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
                 .map(field -> field.getField() + ": " + field.getDefaultMessage())
-                .findFirst()
-                .orElse("Validation error");
+                //.findFirst() // gets the first validation error
+                //.orElse("Validation error");
+                .collect(Collectors.joining("; ")); // gets all the errors, not just the first one
 
         CustomErrorResponse error = CustomErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
