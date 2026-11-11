@@ -52,7 +52,7 @@ public class TaskControllerTest {
         mockMvc.perform(post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("Test task"))
                 .andExpect(jsonPath("$.completed").value(false));
     }
